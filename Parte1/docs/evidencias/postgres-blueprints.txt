@@ -1,0 +1,30 @@
+$ docker exec -it blueprints-postgres psql -U blueprints -d blueprints
+
+blueprints=# \dt
+            List of relations
+ Schema |    Name    | Type  |   Owner    
+--------+------------+-------+------------
+ public | blueprints | table | blueprints
+ public | points     | table | blueprints
+(2 rows)
+
+blueprints=# SELECT * FROM blueprints;
+ id | author |  name  
+----+--------+--------
+  1 | john   | house
+  2 | john   | garage
+(2 rows)
+
+blueprints=# SELECT b.author, b.name, p.position, p.x, p.y FROM blueprints b JOIN points p ON p.blueprint_id = b.id ORDER BY b.id, p.position;
+ author |  name  | position | x  | y  
+--------+--------+----------+----+----
+ john   | house  |        0 |  0 |  0
+ john   | house  |        1 | 10 |  0
+ john   | house  |        2 | 10 | 10
+ john   | house  |        3 |  0 | 10
+ john   | house  |        4 |  5 |  5
+ john   | garage |        0 |  5 |  5
+ john   | garage |        1 |  5 |  5
+ john   | garage |        2 | 15 |  5
+(8 rows)
+

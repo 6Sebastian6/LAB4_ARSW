@@ -1,0 +1,47 @@
+Sesión real contra la app corriendo con PostgreSQL (docker compose). Base de datos vacía al inicio.
+
+$ curl -s http://localhost:8080/api/v1/blueprints
+{"code":200,"message":"OK","data":[]}                                                        [200]
+
+$ curl -s -X POST http://localhost:8080/api/v1/blueprints -H 'Content-Type: application/json' \
+    -d '{"author":"john","name":"house","points":[{"x":0,"y":0},{"x":10,"y":0},{"x":10,"y":10},{"x":0,"y":10}]}'
+{"code":201,"message":"Created","data":{"author":"john","name":"house","points":[{"x":0,"y":0},{"x":10,"y":0},{"x":10,"y":10},{"x":0,"y":10}]}}   [201]
+
+$ curl -s -X POST http://localhost:8080/api/v1/blueprints -H 'Content-Type: application/json' \
+    -d '{"author":"john","name":"garage","points":[{"x":5,"y":5},{"x":5,"y":5},{"x":15,"y":5}]}'
+{"code":201,"message":"Created","data":{"author":"john","name":"garage","points":[{"x":5,"y":5},{"x":5,"y":5},{"x":15,"y":5}]}}   [201]
+
+$ curl -s -X POST http://localhost:8080/api/v1/blueprints -H 'Content-Type: application/json' \
+    -d '{"author":"john","name":"house","points":[]}'
+{"code":400,"message":"Blueprint already exists: john:house","data":null}                    [400]
+
+$ curl -s -X POST http://localhost:8080/api/v1/blueprints -H 'Content-Type: application/json' \
+    -d '{"author":"","name":"x","points":[]}'
+{"code":400,"message":"author: no debe estar vacío","data":null}                             [400]
+
+$ curl -s -X PUT http://localhost:8080/api/v1/blueprints/john/house/points -H 'Content-Type: application/json' \
+    -d '{"x":5,"y":5}'
+{"code":202,"message":"Accepted","data":{"x":5,"y":5}}                                       [202]
+
+$ curl -s http://localhost:8080/api/v1/blueprints/john/house
+{"code":200,"message":"OK","data":{"author":"john","name":"house","points":[{"x":0,"y":0},{"x":10,"y":0},{"x":10,"y":10},{"x":0,"y":10},{"x":5,"y":5}]}}   [200]
+
+$ curl -s http://localhost:8080/api/v1/blueprints/john
+{"code":200,"message":"OK","data":[{"author":"john","name":"house","points":[...5 puntos...]},{"author":"john","name":"garage","points":[{"x":5,"y":5},{"x":5,"y":5},{"x":15,"y":5}]}]}   [200]
+
+$ curl -s http://localhost:8080/api/v1/blueprints/nobody
+{"code":404,"message":"No blueprints for author: nobody","data":null}                        [404]
+
+$ curl -s http://localhost:8080/api/v1/blueprints/john/none
+{"code":404,"message":"Blueprint not found: john/none","data":null}                          [404]
+
+$ curl -s http://localhost:8080/actuator/health
+{"status":"UP"}
+
+--- Perfil redundancy (mvn spring-boot:run -Dspring-boot.run.profiles=redundancy) ---
+$ curl -s http://localhost:8080/api/v1/blueprints/john/garage
+{"code":200,"message":"OK","data":{"author":"john","name":"garage","points":[{"x":5,"y":5},{"x":15,"y":5}]}}   [200]  <- el (5,5) consecutivo duplicado fue eliminado
+
+--- Perfil undersampling (mvn spring-boot:run -Dspring-boot.run.profiles=undersampling) ---
+$ curl -s http://localhost:8080/api/v1/blueprints/john/house
+{"code":200,"message":"OK","data":{"author":"john","name":"house","points":[{"x":0,"y":0},{"x":10,"y":10},{"x":5,"y":5}]}}   [200]  <- conserva 1 de cada 2 puntos (indices 0, 2, 4)

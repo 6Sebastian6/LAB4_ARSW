@@ -16,6 +16,11 @@ API REST para gestionar planos (*blueprints*) y sus puntos, con persistencia en 
    ```bash
    docker compose up -d
    ```
+   Si ya tienes un PostgreSQL local ocupando el puerto 5432, publica el contenedor en otro puerto y apunta la app a él:
+   ```bash
+   POSTGRES_PORT=5433 docker compose up -d
+   DB_PORT=5433 mvn spring-boot:run
+   ```
 2. Ejecutar la aplicación:
    ```bash
    mvn spring-boot:run
@@ -63,15 +68,15 @@ Todas las respuestas usan el mismo envoltorio:
 ```
 En los errores `data` es `null` y `message` describe la causa.
 
-Ejemplos con `curl`:
+Ejemplos con `curl` (la base inicia vacía, por eso primero se crea un blueprint):
 ```bash
+curl -i -X POST http://localhost:8080/api/v1/blueprints -H 'Content-Type: application/json' \
+  -d '{ "author":"john","name":"house","points":[{"x":0,"y":0},{"x":10,"y":0},{"x":10,"y":10}] }'
+curl -i -X PUT http://localhost:8080/api/v1/blueprints/john/house/points -H 'Content-Type: application/json' \
+  -d '{ "x":0,"y":10 }'
 curl -s http://localhost:8080/api/v1/blueprints | jq
 curl -s http://localhost:8080/api/v1/blueprints/john | jq
 curl -s http://localhost:8080/api/v1/blueprints/john/house | jq
-curl -i -X POST http://localhost:8080/api/v1/blueprints -H 'Content-Type: application/json' \
-  -d '{ "author":"john","name":"kitchen","points":[{"x":1,"y":1},{"x":2,"y":2}] }'
-curl -i -X PUT http://localhost:8080/api/v1/blueprints/john/kitchen/points -H 'Content-Type: application/json' \
-  -d '{ "x":3,"y":3 }'
 ```
 
 ## 📖 Documentación y monitoreo
@@ -79,7 +84,19 @@ curl -i -X PUT http://localhost:8080/api/v1/blueprints/john/kitchen/points -H 'C
 - OpenAPI JSON: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
 - Actuator: [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health), `/actuator/metrics`
 
-Evidencia en base de datos (tras crear un blueprint):
+## 📸 Evidencias
+Generadas con la app corriendo contra PostgreSQL en Docker (carpeta [`docs/evidencias/`](docs/evidencias/)):
+
+| Evidencia | Archivo |
+|-----------|---------|
+| Swagger UI con los 5 endpoints y los esquemas `ApiResponse*` | [`swagger-ui.png`](docs/evidencias/swagger-ui.png) |
+| Operación documentada (parámetros, ejemplos, respuestas 200/404) | [`swagger-ui-get-blueprint.png`](docs/evidencias/swagger-ui-get-blueprint.png) |
+| Sesión completa de peticiones: 200/201/202/400/404 y filtros por perfil | [`api-requests.txt`](docs/evidencias/api-requests.txt) |
+| Tablas `blueprints` y `points` consultadas con `psql` | [`postgres-blueprints.txt`](docs/evidencias/postgres-blueprints.txt) |
+
+![Swagger UI](docs/evidencias/swagger-ui.png)
+
+Para reproducir la consulta en base de datos:
 ```bash
 docker exec -it blueprints-postgres psql -U blueprints -d blueprints \
   -c "SELECT b.author, b.name, p.position, p.x, p.y FROM blueprints b JOIN points p ON p.blueprint_id = b.id ORDER BY b.id, p.position;"

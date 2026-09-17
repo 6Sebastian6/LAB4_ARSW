@@ -13,6 +13,7 @@ public class OpenApiConfig {
         return new OpenAPI().info(new Info()
                 .title("ARSW Blueprints API")
                 .version("v1")
-                .description("Blueprints Laboratory (Java 21 / Spring Boot 3.3.x)"));
+                .description("Blueprints Laboratory (Java 21 / Spring Boot 3.3.x). "
+                        + "Todas las respuestas usan el envoltorio ApiResponse { code, message, data }."));
     }
 }

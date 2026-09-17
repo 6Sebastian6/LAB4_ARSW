@@ -8,6 +8,14 @@ Incluye un endpoint didáctico `/auth/login` que emite el token para facilitar l
 
 ---
 
+## Organización del repositorio
+| Carpeta | Contenido |
+|---------|-----------|
+| [`Parte1/`](Parte1/README.md) | Parte 1 completa: REST API Blueprints con PostgreSQL, `ApiResponse<T>`, `/api/v1`, Swagger, filtros y pruebas |
+| raíz (`src/`) | Parte 2: la misma API protegida con JWT (OAuth 2.0 Resource Server) |
+
+---
+
 ## Objetivos
 - Implementar seguridad en servicios REST usando **OAuth2 Resource Server**.
 - Configurar emisión y validación de **JWT**.

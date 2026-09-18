@@ -17,6 +17,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -43,6 +44,7 @@ public class BlueprintsAPIController {
                             schema = @Schema(implementation = ApiResponse.class)))
     })
     @GetMapping
+    @PreAuthorize("hasAuthority('SCOPE_blueprints.read')")
     public ResponseEntity<ApiResponse<Set<Blueprint>>> getAll() {
         return ResponseEntity.ok(ApiResponse.ok(services.getAllBlueprints()));
     }
@@ -65,6 +67,7 @@ public class BlueprintsAPIController {
                             schema = @Schema(implementation = ApiResponse.class)))
     })
     @GetMapping("/{author}")
+    @PreAuthorize("hasAuthority('SCOPE_blueprints.read')")
     public ResponseEntity<ApiResponse<Set<Blueprint>>> byAuthor(
             @Parameter(description = "Nombre del autor", required = true, example = "john")
             @PathVariable String author) {
@@ -94,6 +97,7 @@ public class BlueprintsAPIController {
                             schema = @Schema(implementation = ApiResponse.class)))
     })
     @GetMapping("/{author}/{bpname}")
+    @PreAuthorize("hasAuthority('SCOPE_blueprints.read')")
     public ResponseEntity<ApiResponse<Blueprint>> byAuthorAndName(
             @Parameter(description = "Nombre del autor", required = true, example = "john")
             @PathVariable String author,
@@ -125,6 +129,7 @@ public class BlueprintsAPIController {
                             schema = @Schema(implementation = ApiResponse.class)))
     })
     @PostMapping
+    @PreAuthorize("hasAuthority('SCOPE_blueprints.write')")
     public ResponseEntity<ApiResponse<Blueprint>> add(
             @Valid @RequestBody NewBlueprintRequest req) {
         try {
@@ -156,6 +161,7 @@ public class BlueprintsAPIController {
                             schema = @Schema(implementation = ApiResponse.class)))
     })
     @PutMapping("/{author}/{bpname}/points")
+    @PreAuthorize("hasAuthority('SCOPE_blueprints.write')")
     public ResponseEntity<ApiResponse<Point>> addPoint(
             @Parameter(description = "Nombre del autor", required = true, example = "john")
             @PathVariable String author,

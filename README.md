@@ -108,10 +108,25 @@ Tambien ponemos un compose.yaml copiado en la raíz del proyecto para levantar e
 Con el Docker encendido ponemos estos comandos.
 
 se ejecuta de esta forma
+
 ``` shell
 docker compose up -d      # levanta el Postgres
 mvn clean spring-boot:run #arrabca el proyecto
 ```
+---
+En el power shel para hacer el login y guardar la respuesta ejecutamos
+```bash
+$response = Invoke-RestMethod -Uri http://localhost:8080/auth/login -Method Post -ContentType "application/json" -Body '{"username":"student","password":"student123"}'
+```
+Para extraer el token y usarla en una variable
+```bash
+$token = $response.access_token
+```
+Para consumir el endpoint que esta protegido por el token
+```bash
+Invoke-RestMethod -Uri http://localhost:8080/api/v1/blueprints -Headers @{ Authorization = "Bearer $token" }
+```
+![Token JWT decodificado](images/token.png)
 
 ## Estructura del proyecto
 ```

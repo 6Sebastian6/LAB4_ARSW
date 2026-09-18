@@ -14,7 +14,6 @@ co\edu\eci\blueprints\persistence\entity\PointEntity.class
 co\edu\eci\blueprints\controllers\BlueprintsAPIController$NewBlueprintRequest.class
 co\edu\eci\blueprints\persistence\entity\BlueprintJpaRepository.class
 co\edu\eci\blueprints\security\InMemoryUserService.class
-co\edu\eci\blueprints\api\BlueprintController.class
 co\edu\eci\blueprints\model\Blueprint.class
 co\edu\eci\blueprints\auth\AuthController.class
 co\edu\eci\blueprints\dto\ApiResponse.class

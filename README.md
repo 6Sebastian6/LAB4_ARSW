@@ -97,6 +97,22 @@ Content-Type: application/json
 
 ---
 
+## Levantar el Postgres 
+
+Reemplazamos el application.yml en resources, poniendole la conexión a postgresSQL y el hibernate.
+
+
+Tambien ponemos un compose.yaml copiado en la raíz del proyecto para levantar el postgres 16 con las credenciales
+
+
+Con el Docker encendido ponemos estos comandos.
+
+se ejecuta de esta forma
+``` shell
+docker compose up -d      # levanta el Postgres
+mvn clean spring-boot:run #arrabca el proyecto
+```
+
 ## Estructura del proyecto
 ```
 src/main/java/co/edu/eci/blueprints/
